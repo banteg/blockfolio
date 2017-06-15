@@ -10,26 +10,33 @@ def get_all_positions(device_id):
     return ['{base}-{coin}'.format_map(p) for p in data['positionList'] if p['quantity'] > 0]
 
 
-def get_coin_summary(device_id, pair, fiat_currency='USD'):
+def get_coin_summary(device_id, pair, fiat_currency=None):
     url = f'{base}/get_coin_summary/{device_id}/{pair}'
-    data = requests.get(url, params={'fiat_currency': fiat_currency}).json()
+    params = {'fiat_currency': fiat_currency} if fiat_currency else {}
+    return requests.get(url, params=params).json()
+
+
+def format_summary(data, fiat=False):
+    Fiat = 'Fiat' if fiat else ''
     h = data['holdings']
     return {
         'coin': h['coin'],
         'holdings': h['quantityString'],
-        'net cost': h['netCostString'],
-        'market value': h['holdingValueString'],
-        'profit/loss': h['lifetimeChangeString'],
+        'net cost': h[f'netCost{Fiat}String'],
+        'market value': h[f'holdingValue{Fiat}String'],
+        'profit/loss': h[f'lifetimeChange{Fiat}String'],
     }
 
 
 @click.command()
 @click.argument('device_id')
-def main(device_id):
+@click.option('-f', '--fiat', help='Fiat currency')
+def main(device_id, fiat):
     pairs = get_all_positions(device_id)
     summaries = []
     for pair in pairs:
-        summaries.append(get_coin_summary(device_id, pair))
+        summary = get_coin_summary(device_id, pair, fiat)
+        summaries.append(format_summary(summary, bool(fiat)))
     print(tabulate(summaries, headers='keys'))
 
 
