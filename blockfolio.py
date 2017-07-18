@@ -2,7 +2,7 @@ import click
 import requests
 from tabulate import tabulate
 
-base = 'http://blockfoliorest-pxrpmzggzv.elasticbeanstalk.com/rest'
+base = 'https://api-v0.blockfolio.com/rest'
 
 
 def get_all_positions(device_id):

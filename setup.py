@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='blockfolio',
-    version='1.0.0',
+    version='1.1.0',
     description='Blockfolio CLI',
     url='https://github.com/banteg/blockfolio',
     py_modules=['blockfolio'],
